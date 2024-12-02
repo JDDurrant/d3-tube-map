@@ -1,3 +1,7 @@
+/**
+ * @typedef {[x: number, y: number]} Point
+ */
+
 import * as d3 from "d3";
 import {
   apply2d,
@@ -7,25 +11,34 @@ import {
   normalize,
 } from "./directions";
 
+type Point = [x: number, y: number];
+
 /**
  * Return an SVG instruction to move to the given point.
+ *
+ * @param {Point} point
  */
-function svgMoveTo(point) {
+function svgMoveTo(point: Point) {
   return `M${point[0]},${point[1]}`;
 }
 
 /**
  * Return an SVG instruction to draw a line to the given point.
+ *
+ * @param {Point} point
  */
-function svgLineTo(point) {
+function svgLineTo(point: Point) {
   return `L${point[0]},${point[1]}`;
 }
 
 /**
  * Return an SVG instruction to draw a quadratic Bezier curve to the given end point,
  * using the given control point.
+ *
+ * @param {Point} controlPoint
+ * @param {Point} endPoint
  */
-function svgQuadraticCurveTo(controlPoint, endPoint) {
+function svgQuadraticCurveTo(controlPoint: Point, endPoint: Point) {
   return `Q${controlPoint[0]},${controlPoint[1]},${endPoint[0]},${endPoint[1]}`;
 }
 
@@ -56,7 +69,10 @@ function coordTransform(
   ];
 }
 
-export function interchange(lineWidth) {
+/**
+ * @param {number} lineWidth
+ */
+export function interchange(lineWidth: number) {
   return d3
     .arc()
     .innerRadius(0)

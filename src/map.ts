@@ -1,27 +1,43 @@
 import * as d3 from "d3";
 
-import { directionVector, interchangeShift, normalize } from "./directions";
+import { CardinalDirection, directionVector, interchangeShift, normalize } from "./directions";
 import { interchange, line, populateLineDirections, station } from "./curve";
 
 import lineList from "./lines";
 import stationList from "./stations";
+import { MapData, MapLine, MapStation } from "./types/input";
+
+export type Coordinates = [x: number, y: number];
+
+type TransformedStation = MapStation & {};
+
+export type TransformedMapData = MapData & {
+  raw: MapLine[];
+};
+
+type MapMargin = {
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+};
 
 export default function () {
-  var margin = { top: 80, right: 80, bottom: 20, left: 80 };
+  var margin: MapMargin = { top: 80, right: 80, bottom: 20, left: 80 }
   var width = 760;
   var height = 640;
   var xScale = d3.scaleLinear();
   var yScale = d3.scaleLinear();
-  var lineWidth;
+  var lineWidth: number;
   var lineWidthMultiplier = 0.8;
   var lineWidthTickRatio = 3 / 2;
   var svg;
-  var _data;
-  var gMap;
+  var _data: TransformedMapData;
+  var gMap: d3.Selection<SVGGElement, MapData, d3.BaseType, unknown>;
 
   var listeners = d3.dispatch("click");
 
-  function map(selection) {
+  function map(selection: d3.Selection<d3.BaseType, MapData, d3.BaseType, unknown>) {
     selection.each(function (data) {
       _data = transformData(data);
 
@@ -100,19 +116,19 @@ export default function () {
     });
   }
 
-  map.width = function (w) {
+  map.width = function (w: number) {
     if (!arguments.length) return width;
     width = w;
     return map;
   };
 
-  map.height = function (h) {
+  map.height = function (h: number) {
     if (!arguments.length) return height;
     height = h;
     return map;
   };
 
-  map.margin = function (m) {
+  map.margin = function (m: MapMargin) {
     if (!arguments.length) return margin;
     margin = m;
     return map;
@@ -310,7 +326,7 @@ export default function () {
       });
   }
 
-  function transformData(data) {
+  function transformData(data: MapData) {
     data.lines.forEach((line) => populateLineDirections(line));
     if (data.river !== undefined) {
       populateLineDirections(data.river);
@@ -324,17 +340,17 @@ export default function () {
     };
   }
 
-  function extractStations(data) {
+  function extractStations(data: MapData) {
     data.lines.forEach(function (line) {
       for (var node = 0; node < line.nodes.length; node++) {
         var d = line.nodes[node];
 
         if (!d.hasOwnProperty("name")) continue;
 
-        if (!data.stations.hasOwnProperty(d.name))
+        if (!data.stations.hasOwnProperty(d.name!))
           throw new Error("Cannot find station with key: " + d.name);
 
-        var station = data.stations[d.name];
+        var station = data.stations[d.name!];
 
         station.x = d.coords[0];
         station.y = d.coords[1];
@@ -390,7 +406,7 @@ export default function () {
     return stationList(data.stations);
   }
 
-  function extractLines(data) {
+  function extractLines(data: MapLine[]) {
     var lines = [];
 
     data.forEach(function (line) {
